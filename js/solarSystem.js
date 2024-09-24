@@ -175,7 +175,7 @@ const genratePlanet = (size, planetTexture, x, ring) => {
   scene.add(planetObj);
 
   planetObj.add(planet);
-  createLineLoopWithMesh(x, 0xffffff, 3);
+  createLineLoopWithMesh(x, 0xffffff, 1);
   return {
     planetObj: planetObj,
     planet: planet,
