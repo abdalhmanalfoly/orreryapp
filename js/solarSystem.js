@@ -1,6 +1,7 @@
 //Import
-import * as THREE from "https://unpkg.com/three@0.127.0/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.127.0/examples/jsm/controls/OrbitControls.js";                                    
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+                     
 //////////////////////////////////////
 //NOTE Creating renderer
 const renderer = new THREE.WebGLRenderer();
@@ -26,6 +27,7 @@ const saturnTexture = textureLoader.load("./image/saturn.jpg");
 const uranusTexture = textureLoader.load("./image/uranus.jpg");
 const neptuneTexture = textureLoader.load("./image/neptune.jpg");
 const plutoTexture = textureLoader.load("./image/pluto.jpg");
+const moonTexture = textureLoader.load("./image/moon.jpeg");
 const saturnRingTexture = textureLoader.load("./image/saturn_ring.png");
 const uranusRingTexture = textureLoader.load("./image/uranus_ring.png");
 //////////////////////////////////////
@@ -149,38 +151,48 @@ const planetSizes = {
 
 ////////////////////////////////////////////
 //NOTE: create planet
-const genratePlanet = (size, planetTexture, x, ring) => {
+const generatePlanet = (size, planetTexture, x, ring,name, moon) => {
   const planetGeometry = new THREE.SphereGeometry(size, 50, 50);
-  const planetMaterial = new THREE.MeshStandardMaterial({
-    map: planetTexture,
-  });
+  const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture });
   const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+  
+  // إضافة خاصية name
+  planet.name = name; 
+  
   const planetObj = new THREE.Object3D();
   planet.position.set(x, 0, 0);
+  
+  // إضافة الحلقات إذا كانت موجودة
   if (ring) {
-    const ringGeo = new THREE.RingGeometry(
-      ring.innerRadius,
-      ring.outerRadius,
-      32
-    );
-    const ringMat = new THREE.MeshBasicMaterial({
-      map: ring.ringmat,
-      side: THREE.DoubleSide,
-    });
+    const ringGeo = new THREE.RingGeometry(ring.innerRadius, ring.outerRadius, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ map: ring.ringmat, side: THREE.DoubleSide });
     const ringMesh = new THREE.Mesh(ringGeo, ringMat);
     planetObj.add(ringMesh);
     ringMesh.position.set(x, 0, 0);
     ringMesh.rotation.x = -0.5 * Math.PI;
   }
-  scene.add(planetObj);
 
+  
+  if (moon) {
+    const moonGeometry = new THREE.SphereGeometry(moon.size, 20, 20);
+    const moonMaterial = new THREE.MeshBasicMaterial({ map: moon.texture });
+    const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
+    
+    moonMesh.position.set(x + moon.distanceFromPlanet, 0.7, 0); 
+    planetObj.add(moonMesh); 
+
+
+
+  }
+  
+  scene.add(planetObj);
   planetObj.add(planet);
   createLineLoopWithMesh(x, 0xffffff, 1);
-  return {
-    planetObj: planetObj,
-    planet: planet,
-  };
+  
+  return { planetObj: planetObj, planet: planet };
 };
+
+
 
 
 
@@ -244,59 +256,61 @@ const defaultSpeeds = {
 
 const planets = [
   {
-    ...genratePlanet(planetSizes.mercury, mercuryTexture, planetDistances.mercury),
+    ...generatePlanet(planetSizes.mercury, mercuryTexture, planetDistances.mercury, null, 'mercury'),
     rotaing_speed_around_sun: defaultSpeeds.mercuryAround,
     self_rotation_speed: defaultSpeeds.mercurySelf,
   },
   {
-    ...genratePlanet(planetSizes.venus, venusTexture, planetDistances.venus),
+    ...generatePlanet(planetSizes.venus, venusTexture, planetDistances.venus, null, 'venus'),
     rotaing_speed_around_sun: defaultSpeeds.venusAround,
     self_rotation_speed: defaultSpeeds.venusSelf,
   },
   {
-    ...genratePlanet(planetSizes.earth, earthTexture, planetDistances.earth),
+    ...generatePlanet(
+      planetSizes.earth,
+      earthTexture,
+      planetDistances.earth,
+      null,
+      'earth'
+      ,
+      { size:0.273 , texture: moonTexture, distanceFromPlanet: 3 } // إضافة معلومات القمر
+    ),
+    isStationary: true,
     rotaing_speed_around_sun: defaultSpeeds.earthAround,
     self_rotation_speed: defaultSpeeds.earthSelf,
   },
   {
-    ...genratePlanet(planetSizes.mars, marsTexture, planetDistances.mars),
+    ...generatePlanet(planetSizes.mars, marsTexture, planetDistances.mars, null, 'mars'),
     rotaing_speed_around_sun: defaultSpeeds.marsAround,
     self_rotation_speed: defaultSpeeds.marsSelf,
   },
   {
-    ...genratePlanet(planetSizes.jupiter, jupiterTexture, planetDistances.jupiter),
+    ...generatePlanet(planetSizes.jupiter, jupiterTexture, planetDistances.jupiter, null, 'jupiter'),
     rotaing_speed_around_sun: defaultSpeeds.jupiterAround,
     self_rotation_speed: defaultSpeeds.jupiterSelf,
   },
   {
-    ...genratePlanet(planetSizes.saturn, saturnTexture, planetDistances.saturn, {
-      innerRadius: 10,
-      outerRadius: 20,
-      ringmat: saturnRingTexture,
-    }),
+    ...generatePlanet(planetSizes.saturn, saturnTexture, planetDistances.saturn, { innerRadius: 10, outerRadius: 20, ringmat: saturnRingTexture }, 'saturn'),
     rotaing_speed_around_sun: defaultSpeeds.saturnAround,
     self_rotation_speed: defaultSpeeds.saturnSelf,
   },
   {
-    ...genratePlanet(planetSizes.uranus, uranusTexture, planetDistances.uranus, {
-      innerRadius: 7,
-      outerRadius: 12,
-      ringmat: uranusRingTexture,
-    }),
+    ...generatePlanet(planetSizes.uranus, uranusTexture, planetDistances.uranus, { innerRadius: 7, outerRadius: 12, ringmat: uranusRingTexture }, 'uranus'),
     rotaing_speed_around_sun: defaultSpeeds.uranusAround,
     self_rotation_speed: defaultSpeeds.uranusSelf,
   },
   {
-    ...genratePlanet(planetSizes.neptune, neptuneTexture, planetDistances.neptune),
+    ...generatePlanet(planetSizes.neptune, neptuneTexture, planetDistances.neptune, null, 'neptune'),
     rotaing_speed_around_sun: defaultSpeeds.neptuneAround,
     self_rotation_speed: defaultSpeeds.neptuneSelf,
   },
   {
-    ...genratePlanet(planetSizes.pluto, plutoTexture, planetDistances.pluto),
+    ...generatePlanet(planetSizes.pluto, plutoTexture, planetDistances.pluto, null, 'pluto'),
     rotaing_speed_around_sun: defaultSpeeds.plutoAround,
     self_rotation_speed: defaultSpeeds.plutoSelf,
   },
 ];
+
 
 ////////////////////////////////////////////////////////////////////////////
 //NOTE - GUI options
@@ -306,7 +320,10 @@ const options = {
   "Real view": true,
   "Show path": true,
   "Real speed": false,
+  "earth move":false,
   speed: 1,
+  "Focus on Earth": false,
+  
 };
 gui.add(options, "Real view").onChange((e) => {
   ambientLight.intensity = e ? 0 : 0.5;
@@ -323,6 +340,53 @@ gui.add(options, "Real speed").onChange((e) => {
   updatePlanetSpeeds(e);
   
 });
+
+
+let earthMoving = false;
+gui.add(options, "earth move").onChange((e) => {
+  moveEarth(e)
+  
+});
+
+
+
+function moveEarth() {
+  const earth = planets.find(p => p.planet.name === 'earth'); 
+  if (earth) {
+    earthMoving = !earthMoving; // عكس حالة الحركة
+    earth.isStationary = !earthMoving; // إذا كانت الأرض متحركة، اجعلها ثابتة والعكس
+  }
+}
+
+
+let lastEarthPosition;
+gui.add(options, "Focus on Earth").onChange((e) => {
+  const earth = planets[2]; 
+  if (e) {
+    earth.isStationary = true; 
+    const earthPlanet = planets.find(p => p.planet.name === 'earth').planet;
+    
+    // تغيير موقع الأرض إلى القيم المطلوبة
+    earthPlanet.position.set(72, 0, 0); 
+    lastEarthPosition = earthPlanet.position.clone();
+    orbit.target.copy(earthPlanet.position);
+    console.log(lastEarthPosition); // تسجيل الموقع الحالي للأرض
+    console.log(earthPlanet.position);
+    
+    let earthPosition = lastEarthPosition;
+    orbit.update();
+    
+    camera.position.set(earthPosition.x + 1, earthPosition.y + 2, earthPosition.z + 3);
+    camera.lookAt(earthPosition);
+    
+  } else {
+    
+    camera.position.set(-70, 90, 180);
+    camera.lookAt(sun.position);
+  }
+});
+
+
 
 function updatePlanetSpeeds(useRealSpeeds) {
   planets.forEach((planet, index) => {
@@ -343,20 +407,81 @@ function updatePlanetSpeeds(useRealSpeeds) {
 const maxSpeed = new URL(window.location.href).searchParams.get("ms")*1
 gui.add(options, "speed", 0, maxSpeed?maxSpeed:20);
 
+
+var object4 = { 
+  add: function() { 
+    window.location.reload(); 
+  } 
+};
+
+
+var button1 = gui.add(object4, "add").name("back to solar system");
+
+
+button1.__li.style.backgroundColor = "#2196F3"; 
+button1.__li.style.color = "black"; 
+
+button1.__li.addEventListener("mouseenter", function() {
+  button1.__li.style.backgroundColor = "#1976D2"; 
+});
+
+button1.__li.addEventListener("mouseleave", function() {
+  button1.__li.style.backgroundColor = "#2196F3"; 
+});
+
+
+
+
+var object1 = { 
+  add: function() { 
+    
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  } 
+};
+
+var button = gui.add(object1, "add").name("Full Screen View"); 
+
+button.__li.style.backgroundColor = "black"; 
+button.__li.style.color = "white"; 
+
+
+
+document.addEventListener("fullscreenchange", function() {
+  if (document.fullscreenElement) {
+    button.name("Exit Full Screen View");
+  } else {
+    button.name("Full Screen View"); 
+  }
+});
+
+
 //////////////////////////////////////
 
 //////////////////////////////////////
 //NOTE - animate function
+
+
+// Animation function
 function animate(time) {
-  sun.rotateY(options.speed *  0.00004 );
-  planets.forEach(
-    ({ planetObj, planet, rotaing_speed_around_sun, self_rotation_speed }) => {
+  sun.rotateY(options.speed * 0.00004);
+  
+  planets.forEach(({ planetObj, planet, rotaing_speed_around_sun, self_rotation_speed, isStationary }) => {
+    if (!isStationary) {
       planetObj.rotateY(options.speed * rotaing_speed_around_sun);
       planet.rotateY(options.speed * self_rotation_speed);
     }
-  );
+  });
+  
   renderer.render(scene, camera);
 }
+
 renderer.setAnimationLoop(animate);
 //////////////////////////////////////
 
