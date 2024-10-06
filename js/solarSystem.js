@@ -1,6 +1,7 @@
 //Import
 import * as THREE from "https://unpkg.com/three@0.127.0/build/three.module.js";
-import { OrbitControls } from "https://unpkg.com/three@0.127.0/examples/jsm/controls/OrbitControls.js";               
+import { OrbitControls } from "https://unpkg.com/three@0.127.0/examples/jsm/controls/OrbitControls.js";
+
                      
 //////////////////////////////////////
 //NOTE Creating renderer
@@ -30,6 +31,9 @@ const plutoTexture = textureLoader.load("./image/pluto.jpg");
 const moonTexture = textureLoader.load("./image/moon.jpeg");
 const saturnRingTexture = textureLoader.load("./image/saturn_ring.png");
 const uranusRingTexture = textureLoader.load("./image/uranus_ring.png");
+
+
+
 //////////////////////////////////////
 
 //////////////////////////////////////
@@ -41,12 +45,12 @@ const scene = new THREE.Scene();
 //NOTE screen bg
 const cubeTextureLoader = new THREE.CubeTextureLoader();
 const cubeTexture = cubeTextureLoader.load([
-  starTexture,
-  starTexture,
-  starTexture,
-  starTexture,
-  starTexture,
-  starTexture,
+  "./image/stars.jpg",
+  "./image/stars.jpg",
+  "./image/stars.jpg",
+  "./image/stars.jpg",
+  "./image/stars.jpg",
+  "./image/stars.jpg",
 ]);
 scene.background = cubeTexture;
 //////////////////////////////////////
@@ -149,20 +153,23 @@ const planetSizes = {
   pluto: 0.7     
 };
 
+const SpaceshipArray = [];
+
+const meteorArray = []; 
 ////////////////////////////////////////////
 //NOTE: create planet
-const generatePlanet = (size, planetTexture, x, ring,name, moon) => {
+const generatePlanet = (size, planetTexture, x, ring,name, moon,meteor,Spaceship ) => {
   const planetGeometry = new THREE.SphereGeometry(size, 50, 50);
   const planetMaterial = new THREE.MeshStandardMaterial({ map: planetTexture });
   const planet = new THREE.Mesh(planetGeometry, planetMaterial);
   
-  // إضافة خاصية name
+  
   planet.name = name; 
   
   const planetObj = new THREE.Object3D();
   planet.position.set(x, 0, 0);
   
-  // إضافة الحلقات إذا كانت موجودة
+  
   if (ring) {
     const ringGeo = new THREE.RingGeometry(ring.innerRadius, ring.outerRadius, 32);
     const ringMat = new THREE.MeshBasicMaterial({ map: ring.ringmat, side: THREE.DoubleSide });
@@ -184,6 +191,85 @@ const generatePlanet = (size, planetTexture, x, ring,name, moon) => {
 
 
   }
+  
+
+if (meteor) {
+  const meteorCount = 4; 
+  const meteorPositions = [
+    { x: x + 0.7, y: 0.8, z: 0.2 },
+    { x: x + 0.1, y: 1.5, z: 0.6 },
+    { x: x + 0.8, y: 1.6, z: 0.9 },
+    { x: x + 0.5, y: 2.3, z: 0.1 },
+  ];
+
+  const meteorcolor = [
+    0xff0000, 
+    0x8B4513, 
+    0x8B4513, 
+    0x6E8B3D, 
+  ];
+
+  for (let i = 0; i < meteorCount; i++) {
+    
+    const meteorGeometry = new THREE.DodecahedronGeometry(0.02); 
+    const meteorMaterial = new THREE.MeshStandardMaterial({ color: meteorcolor[i] });
+    const meteorMesh = new THREE.Mesh(meteorGeometry, meteorMaterial);
+    
+   
+    meteorMesh.position.set(meteorPositions[i].x, meteorPositions[i].y, meteorPositions[i].z);
+   
+    meteorMesh.visible = false;
+
+    
+    planetObj.add(meteorMesh);
+    
+    meteorArray.push(meteorMesh);
+  }
+}
+
+
+
+
+
+
+if (Spaceship) {
+  const SpaceshipCount = 2; 
+  const SpaceshipPositions = [
+    { x: x + 0.1, y: 0.6, z: +1 },
+    { x: x + 0.1, y: 0.6, z: -1 },
+    { x: x + 0.1, y: 0.6, z: 1 },
+  ];
+
+  const Spaceshiprcolor = [
+    0Xffffff, 
+    0xffffff,
+    0xffffff, 
+ 
+  ];
+
+  for (let i = 0; i < SpaceshipCount; i++) {
+    const SpaceshipGeometry = new THREE.TetrahedronGeometry(0.05); 
+    const SpaceshipMaterial = new THREE.MeshStandardMaterial({ color: Spaceshiprcolor[i] }); 
+    const SpaceshipMesh = new THREE.Mesh(SpaceshipGeometry, SpaceshipMaterial);
+    
+    SpaceshipMesh.position.set(SpaceshipPositions[i].x, SpaceshipPositions[i].y, SpaceshipPositions[i].z);
+   
+    planetObj.add(SpaceshipMesh);
+    
+    SpaceshipMesh.visible = false;
+
+    
+    SpaceshipArray.push(SpaceshipMesh);
+  }
+}
+
+const options = {
+  showSpaceships: false, 
+};
+
+
+
+  
   
   scene.add(planetObj);
   planetObj.add(planet);
@@ -273,7 +359,10 @@ const planets = [
       null,
       'earth'
       ,
-      { size:0.273 , texture: moonTexture, distanceFromPlanet: 3 } // إضافة معلومات القمر
+      { size:0.273 , texture: moonTexture, distanceFromPlanet: 3 } ,
+      {},
+      {},
+      
     ),
     isStationary: true,
     rotaing_speed_around_sun: defaultSpeeds.earthAround,
@@ -320,9 +409,11 @@ const options = {
   "Real view": true,
   "Show path": true,
   "Real speed": false,
-  "earth move":false,
+   "Move Earth":false,
   speed: 1,
   "Focus on Earth": false,
+  "showMeteor" : false,
+  "showSpaceships":false
   
 };
 gui.add(options, "Real view").onChange((e) => {
@@ -343,7 +434,7 @@ gui.add(options, "Real speed").onChange((e) => {
 
 
 let earthMoving = false;
-gui.add(options, "earth move").onChange((e) => {
+gui.add(options, "Move Earth").onChange((e) => {
   moveEarth(e)
   
 });
@@ -353,8 +444,8 @@ gui.add(options, "earth move").onChange((e) => {
 function moveEarth() {
   const earth = planets.find(p => p.planet.name === 'earth'); 
   if (earth) {
-    earthMoving = !earthMoving; // عكس حالة الحركة
-    earth.isStationary = !earthMoving; // إذا كانت الأرض متحركة، اجعلها ثابتة والعكس
+    earthMoving = !earthMoving; 
+    earth.isStationary = !earthMoving; 
   }
 }
 
@@ -366,11 +457,11 @@ gui.add(options, "Focus on Earth").onChange((e) => {
     earth.isStationary = true; 
     const earthPlanet = planets.find(p => p.planet.name === 'earth').planet;
     
-    // تغيير موقع الأرض إلى القيم المطلوبة
+    
     earthPlanet.position.set(72, 0, 0); 
     lastEarthPosition = earthPlanet.position.clone();
     orbit.target.copy(earthPlanet.position);
-    console.log(lastEarthPosition); // تسجيل الموقع الحالي للأرض
+    console.log(lastEarthPosition);
     console.log(earthPlanet.position);
     
     let earthPosition = lastEarthPosition;
@@ -384,6 +475,20 @@ gui.add(options, "Focus on Earth").onChange((e) => {
     camera.position.set(-70, 90, 180);
     camera.lookAt(sun.position);
   }
+});
+
+
+
+gui.add(options, "showMeteor").onChange((e) => {
+  meteorArray.forEach(meteor => {
+    meteor.visible = e; 
+  });
+});
+
+gui.add(options, "showSpaceships").onChange((e) => {
+  SpaceshipArray.forEach(spaceship => {
+    spaceship.visible = e; 
+  });
 });
 
 
