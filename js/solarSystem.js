@@ -555,7 +555,7 @@ button1.__li.style.color = "white";
 var objectDownloadImage = { 
   download: function() { 
     var link = document.createElement('a');
-    link.href = './image/data.png'; 
+    link.href = './image/data.PNG'; 
     link.download = 'image.jpg'; 
     document.body.appendChild(link);
     link.click();
