@@ -232,40 +232,42 @@ if (meteor) {
 
 
 
+
 if (Spaceship) {
   const SpaceshipCount = 2; 
   const SpaceshipPositions = [
     { x: x + 0.1, y: 0.6, z: +1 },
     { x: x + 0.1, y: 0.6, z: -1 },
-    { x: x + 0.1, y: 0.6, z: 1 },
   ];
 
-  const Spaceshiprcolor = [
-    0Xffffff, 
-    0xffffff,
-    0xffffff, 
- 
-  ];
+  const textureLoader = new THREE.TextureLoader();
+  const satelliteTexture = textureLoader.load('./image/sattilind.png'); 
 
   for (let i = 0; i < SpaceshipCount; i++) {
-    const SpaceshipGeometry = new THREE.TetrahedronGeometry(0.05); 
-    const SpaceshipMaterial = new THREE.MeshStandardMaterial({ color: Spaceshiprcolor[i] }); 
-    const SpaceshipMesh = new THREE.Mesh(SpaceshipGeometry, SpaceshipMaterial);
     
-    SpaceshipMesh.position.set(SpaceshipPositions[i].x, SpaceshipPositions[i].y, SpaceshipPositions[i].z);
-   
-    planetObj.add(SpaceshipMesh);
-    
-    SpaceshipMesh.visible = false;
+    const spaceshipGeometry = new THREE.TetrahedronGeometry(0.02);
 
     
-    SpaceshipArray.push(SpaceshipMesh);
+    const spaceshipMaterial = new THREE.MeshStandardMaterial({ map: satelliteTexture });
+    
+    const spaceshipMesh = new THREE.Mesh(spaceshipGeometry, spaceshipMaterial);
+    
+    
+    spaceshipMesh.position.set(SpaceshipPositions[i].x, SpaceshipPositions[i].y, SpaceshipPositions[i].z);
+   
+    
+    planetObj.add(spaceshipMesh);
+    
+    spaceshipMesh.visible = false; 
+    
+    SpaceshipArray.push(spaceshipMesh); 
   }
 }
 
 const options = {
   showSpaceships: false, 
 };
+
 
 
 
