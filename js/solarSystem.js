@@ -539,6 +539,19 @@ button1.__li.addEventListener("mouseleave", function() {
 
 
 
+
+var object4 = { 
+  add: function() { 
+    window.location.reload(); 
+  } 
+};
+
+var button1 = gui.add(object4, "add").name("back to solar system");
+
+
+button1.__li.style.backgroundColor = "#1976D2"; 
+button1.__li.style.color = "white"; 
+
 var objectDownloadImage = { 
   download: function() { 
     var link = document.createElement('a');
@@ -554,7 +567,6 @@ var downloadButton = gui.add(objectDownloadImage, "download").name("data for pla
 
 downloadButton.__li.style.backgroundColor = "#1976D2"; 
 downloadButton.__li.style.color = "white"; 
-
 
 var object1 = { 
   add: function() { 
@@ -584,6 +596,7 @@ document.addEventListener("fullscreenchange", function() {
     button.name("Full Screen View"); 
   }
 });
+
 
 
 //////////////////////////////////////
