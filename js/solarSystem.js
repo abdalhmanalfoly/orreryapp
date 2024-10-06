@@ -521,31 +521,6 @@ var object4 = {
   } 
 };
 
-
-var button1 = gui.add(object4, "add").name("back to solar system");
-
-
-button1.__li.style.backgroundColor = "#2196F3"; 
-button1.__li.style.color = "black"; 
-
-button1.__li.addEventListener("mouseenter", function() {
-  button1.__li.style.backgroundColor = "#1976D2"; 
-});
-
-button1.__li.addEventListener("mouseleave", function() {
-  button1.__li.style.backgroundColor = "#2196F3"; 
-});
-
-
-
-
-
-var object4 = { 
-  add: function() { 
-    window.location.reload(); 
-  } 
-};
-
 var button1 = gui.add(object4, "add").name("back to solar system");
 
 
