@@ -414,8 +414,8 @@ const options = {
    "Move Earth":false,
   speed: 1,
   "Focus on Earth": false,
-  "showMeteor" : false,
-  "showSpaceships":false
+  "show Meteor" : false,
+  "show Satellite":false
   
 };
 gui.add(options, "Real view").onChange((e) => {
@@ -481,13 +481,13 @@ gui.add(options, "Focus on Earth").onChange((e) => {
 
 
 
-gui.add(options, "showMeteor").onChange((e) => {
+gui.add(options, "show Meteor").onChange((e) => {
   meteorArray.forEach(meteor => {
     meteor.visible = e; 
   });
 });
 
-gui.add(options, "showSpaceships").onChange((e) => {
+gui.add(options, "show Satellite").onChange((e) => {
   SpaceshipArray.forEach(spaceship => {
     spaceship.visible = e; 
   });
