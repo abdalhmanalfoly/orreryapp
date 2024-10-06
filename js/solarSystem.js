@@ -539,6 +539,23 @@ button1.__li.addEventListener("mouseleave", function() {
 
 
 
+var objectDownloadImage = { 
+  download: function() { 
+    var link = document.createElement('a');
+    link.href = './image/data.png'; 
+    link.download = 'image.jpg'; 
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } 
+};
+
+var downloadButton = gui.add(objectDownloadImage, "download").name("data for planets");
+
+downloadButton.__li.style.backgroundColor = "#1976D2"; 
+downloadButton.__li.style.color = "white"; 
+
+
 var object1 = { 
   add: function() { 
     
